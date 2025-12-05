@@ -1,0 +1,81 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Architecture Patterns
+
+## Component Architecture
+- **Layout Components**: Located in `components/layout/` for consistent page structure
+- **Feature Components**: Organized by feature (e.g., `components/ai-agent/`)
+- **Shared Components**: Common UI elements like [components/Navigation.tsx](mdc:components/Navigation.tsx) and [components/Footer.tsx](mdc:components/Footer.tsx)
+
+## Service Layer Pattern
+All external API calls and business logic should be encapsulated in services:
+
+### Service Structure
+```typescript
+// Example service pattern
+export class ExampleService {
+  private static baseUrl = process.env.API_BASE_URL;
+  
+  static async methodName(params: ParamsType): Promise<ResponseType> {
+    try {
+      // API call logic
+      const response = await fetch(`${this.baseUrl}/endpoint`);
+      return await response.json();
+    } catch (error) {
+      // Error handling
+      throw new Error('Service error message');
+    }
+  }
+}
+```
+
+### Existing Services
+- [services/loginService.ts](mdc:services/loginService.ts) - Authentication
+- [services/registerService.ts](mdc:services/registerService.ts) - User registration
+- [services/aiAgentService.ts](mdc:services/aiAgentService.ts) - AI functionality
+- [services/chatService.ts](mdc:services/chatService.ts) - Chat operations
+- [services/pdfService.ts](mdc:services/pdfService.ts) - PDF processing
+
+## Type Safety Pattern
+- All data models should be defined in the `types/` directory
+- Use the [types/UserType.ts](mdc:types/UserType.ts) as a reference for interface definitions
+- Always type API responses and component props
+
+## Authentication Pattern
+- Route protection is handled by [middleware.ts](mdc:middleware.ts)
+- Cookie-based authentication using project-specific naming
+- Automatic redirects for protected/auth routes
+
+## State Management
+- Use React hooks for local component state
+- Context providers in `providers/` directory for global state
+- Avoid prop drilling by using appropriate state management patterns
+
+## Error Handling
+- Consistent error handling across all services
+- Toast notifications using `react-hot-toast`
+- Graceful fallbacks for failed API calls
+
+## UI/UX Patterns
+- Mobile-first responsive design with Tailwind CSS
+- Consistent spacing and typography using Montserrat font
+- Dark/light theme support with `next-themes`
+- Loading states and error boundaries for better UX
+
+## File Structure Convention
+```
+feature/
+├── components/           # Feature-specific components
+├── services/            # Feature-specific services  
+├── types/              # Feature-specific types
+└── utils/              # Feature-specific utilities
+```
+
+## Performance Optimization
+- Use Next.js built-in optimizations (Image, Font, etc.)
+- Implement code splitting at route level
+- Use React.memo for expensive components
+- Lazy load components when appropriate

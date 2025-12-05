@@ -1,0 +1,44 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Sarana Omni - Project Overview
+
+This is a **Sarana Omni** Next.js application - an intelligent omnichannel communication platform that integrates WhatsApp to simplify and enhance customer support services for businesses.
+
+## Technology Stack
+- **Framework**: Next.js 15.3.1 with App Router
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 4
+- **UI Components**: Headless UI, Lucide React icons
+- **Authentication**: Cookie-based with middleware protection
+- **State Management**: React hooks and context
+- **Build Tool**: Turbopack for development
+
+## Project Structure
+```
+├── app/                    # Next.js App Router pages
+│   ├── dashboard/         # Protected dashboard area
+│   ├── login/            # Authentication pages
+│   ├── register/         
+│   └── (other routes)/   
+├── components/            # Reusable React components
+│   ├── ai-agent/         # AI-related components
+│   └── layout/           # Layout components
+├── services/             # API service layer
+├── types/                # TypeScript type definitions
+├── helpers/              # Utility functions
+├── providers/            # React context providers
+└── public/              # Static assets
+```
+
+## Key Features
+- User authentication and registration
+- Dashboard with protected routes
+- AI agent integration
+- PDF processing capabilities
+- Omnichannel communication tools
+- WhatsApp integration
+
+The project follows modern Next.js 13+ patterns with server and client components, TypeScript for type safety, and a clean service layer architecture.

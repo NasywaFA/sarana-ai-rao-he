@@ -1,0 +1,104 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Common Development Tasks
+
+## Adding a New Page/Route
+1. Create a new directory in `app/` with the route name
+2. Add a `page.tsx` file with the page component
+3. Update authentication in [middleware.ts](mdc:middleware.ts) if it's a protected route
+4. Add navigation links in [components/Navigation.tsx](mdc:components/Navigation.tsx) if needed
+
+## Creating a New Component
+1. Create the component file in appropriate directory under `components/`
+2. Use TypeScript with proper prop interfaces
+3. Export the component as default
+4. Add to component index files if creating a component library
+
+## Adding a New API Service
+1. Create a new service file in `services/` directory
+2. Follow the existing service pattern from [services/loginService.ts](mdc:services/loginService.ts)
+3. Add proper TypeScript interfaces for request/response
+4. Implement error handling and logging
+
+## Adding New Types
+1. Create or update files in `types/` directory
+2. Follow the pattern from [types/UserType.ts](mdc:types/UserType.ts)
+3. Export interfaces and types properly
+4. Import types in components/services that use them
+
+## Authentication & Route Protection
+- **Protected Routes**: Add route paths to `protectedRoutes` array in [middleware.ts](mdc:middleware.ts)
+- **Auth Routes**: Add to `authRoutes` array for routes that authenticated users shouldn't access
+- **Cookie Management**: Use `${projectName}_auth_token` pattern for consistency
+
+## Styling Guidelines
+```typescript
+// Tailwind CSS class organization
+<div className="
+  // Layout classes first
+  flex flex-col items-center justify-center
+  // Spacing classes
+  p-4 m-2 gap-4
+  // Sizing classes  
+  w-full h-screen max-w-md
+  // Colors and appearance
+  bg-white text-gray-900 rounded-lg shadow-lg
+  // Responsive classes last
+  md:p-6 lg:max-w-lg
+">
+```
+
+## Environment Configuration
+1. Add environment variables to `.env.local` (never commit this file)
+2. Reference them in code using `process.env.VARIABLE_NAME`
+3. Add default values or validation where appropriate
+4. Update Docker configuration if needed
+
+## Error Handling Patterns
+```typescript
+// Service error handling
+try {
+  const result = await someService.method();
+  return result;
+} catch (error) {
+  console.error('Operation failed:', error);
+  toast.error('User-friendly error message');
+  throw error; // Re-throw if needed by caller
+}
+
+// Component error handling
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState<string | null>(null);
+
+const handleOperation = async () => {
+  setLoading(true);
+  setError(null);
+  try {
+    await someOperation();
+    toast.success('Operation successful');
+  } catch (err) {
+    setError('Operation failed');
+    toast.error('Something went wrong');
+  } finally {
+    setLoading(false);
+  }
+};
+```
+
+## Testing New Features
+1. Test authentication flows (login/logout/protected routes)
+2. Test responsive design on different screen sizes
+3. Verify error handling and loading states
+4. Check TypeScript compilation with `npm run lint`
+5. Test production build with `npm run build`
+
+## Performance Optimization Checklist
+- [ ] Use Next.js Image component for images
+- [ ] Implement proper loading states
+- [ ] Add React.memo for expensive components
+- [ ] Use dynamic imports for code splitting
+- [ ] Optimize bundle size with proper imports
+- [ ] Check for memory leaks in useEffect hooks

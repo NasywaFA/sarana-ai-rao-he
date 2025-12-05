@@ -1,0 +1,49 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Coding Standards & Best Practices
+
+## File Organization & Naming
+- Use **PascalCase** for component files (e.g., `UserProfile.tsx`)
+- Use **camelCase** for service files (e.g., `loginService.ts`)
+- Use **kebab-case** for route folders (e.g., `privacy-policy/`)
+- Keep related files grouped in logical directories
+- Use descriptive, meaningful file names
+
+## TypeScript Guidelines
+- Always use TypeScript for all `.ts` and `.tsx` files
+- Define interfaces in the `types/` directory
+- Use proper type annotations for all functions and variables
+- Export types from [types/UserType.ts](mdc:types/UserType.ts) and similar files
+
+## Component Structure
+- Prefer functional components with hooks
+- Use proper imports order: React, Next.js, external libraries, internal modules
+- Implement proper error handling and loading states
+- Use React.memo() for performance optimization when needed
+
+## Styling Conventions
+- Use **Tailwind CSS** for all styling
+- Follow mobile-first responsive design principles
+- Maintain consistent spacing and color schemes
+- Use semantic class names and group related styles
+
+## Authentication & Security
+- All authentication logic should go through [middleware.ts](mdc:middleware.ts)
+- Use environment variables for sensitive configuration
+- Implement proper error handling for API calls
+- Validate user inputs on both client and server sides
+
+## Service Layer
+- All API calls should be handled in the `services/` directory
+- Use consistent error handling patterns across services
+- Implement proper TypeScript interfaces for API responses
+- Cache API responses when appropriate
+
+## Code Quality
+- Follow ESLint rules defined in [eslint.config.mjs](mdc:eslint.config.mjs)
+- Use meaningful variable and function names
+- Write JSDoc comments for complex functions
+- Keep functions small and focused on single responsibilities

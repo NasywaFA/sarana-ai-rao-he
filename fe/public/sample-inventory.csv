@@ -1,0 +1,4 @@
+code,name,type,unit,stock,lead_time
+INV.001,Jamur Shitake Kering,inventory_purchased,Gram,10000,1
+INV.038,Gyoza Skin,inventory_purchased,Pcs,10000,1
+INV.007,Santan,inventory_purchased,ml,10000,1

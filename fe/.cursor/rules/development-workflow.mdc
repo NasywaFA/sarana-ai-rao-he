@@ -1,0 +1,67 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Development Workflow
+
+## Getting Started
+To set up the development environment:
+
+```bash
+# Install dependencies
+npm install
+
+# Start the development server with Turbopack
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Run linting
+npm run lint
+```
+
+## Development Server
+- Access the application at `http://localhost:3000`
+- The development server uses **Turbopack** for faster builds and hot reloading
+- Changes to files will automatically reload the browser
+
+## Project Configuration Files
+- [package.json](mdc:package.json) - Dependencies and scripts
+- [next.config.ts](mdc:next.config.ts) - Next.js configuration
+- [tsconfig.json](mdc:tsconfig.json) - TypeScript configuration
+- [tailwind.config.js](mdc:tailwind.config.js) - Tailwind CSS configuration
+- [eslint.config.mjs](mdc:eslint.config.mjs) - ESLint rules
+
+## Environment Variables
+- Use `PROJECT_NAME` environment variable for cookie naming
+- Store sensitive API keys and configurations in `.env.local`
+- Never commit environment files to version control
+
+## Route Structure
+The application uses Next.js 13+ App Router:
+- `/` - Landing page ([app/page.tsx](mdc:app/page.tsx))
+- `/login` - User authentication
+- `/register` - User registration
+- `/dashboard` - Protected dashboard area (requires authentication)
+- `/terms`, `/privacy-policy`, `/roadmap` - Static pages
+
+## Authentication Flow
+1. User registration/login through dedicated pages
+2. [middleware.ts](mdc:middleware.ts) handles route protection
+3. Authenticated users are redirected from auth pages to dashboard
+4. Unauthenticated users are redirected from protected routes to login
+
+## Docker Support
+The project includes Docker configuration:
+- [Dockerfile](mdc:Dockerfile) for containerization
+- [.dockerignore](mdc:.dockerignore) for excluding files from Docker context
+
+## Code Style
+- Code is automatically formatted and linted
+- Follow the ESLint configuration for consistent code style
+- Use TypeScript strict mode for better type safety

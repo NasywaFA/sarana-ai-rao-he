@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+:root {
+  --sarana-primary: #4270B7;
+  --sarana-primary-light: #5a8ac9;
+  --sarana-primary-dark: #2d5a9e;
+  --sarana-primary-50: #eef2f8;
+  --sarana-primary-100: #dce5f2;
+  --sarana-primary-200: #b9cbe5;
+  --sarana-primary-300: #96b1d8;
+  --sarana-primary-400: #7397cb;
+  --sarana-primary-500: #4270B7;
+  --sarana-primary-600: #3b65a5;
+  --sarana-primary-700: #345a93;
+  --sarana-primary-800: #2d4f81;
+  --sarana-primary-900: #26446f;
+}
+
+body {
+  font-family: var(--font-montserrat), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+/* Primary color text utilities */
+.text-sarana-primary {
+  color: var(--sarana-primary);
+}
+
+.text-sarana-primary-light {
+  color: var(--sarana-primary-light);
+}
+
+.text-sarana-primary-dark {
+  color: var(--sarana-primary-dark);
+}
+
+/* Primary color background utilities */
+.bg-sarana-primary {
+  background-color: var(--sarana-primary);
+}
+
+.bg-sarana-primary-light {
+  background-color: var(--sarana-primary-light);
+}
+
+.bg-sarana-primary-dark {
+  background-color: var(--sarana-primary-dark);
+}
+
+.bg-sarana-primary-50 {
+  background-color: var(--sarana-primary-50);
+}
+
+/* Primary color border utilities */
+.border-sarana-primary {
+  border-color: var(--sarana-primary);
+}
+
+.border-sarana-primary-light {
+  border-color: var(--sarana-primary-light);
+}
+
+.border-sarana-primary-dark {
+  border-color: var(--sarana-primary-dark);
+}
+
+/* Hover states */
+.hover\:bg-sarana-primary:hover {
+  background-color: var(--sarana-primary);
+}
+
+.hover\:bg-sarana-primary-light:hover {
+  background-color: var(--sarana-primary-light);
+}
+
+.hover\:bg-sarana-primary-dark:hover {
+  background-color: var(--sarana-primary-dark);
+}
+
+.hover\:text-sarana-primary:hover {
+  color: var(--sarana-primary);
+}
+
+.hover\:text-sarana-primary-light:hover {
+  color: var(--sarana-primary-light);
+}
+
+.hover\:text-sarana-primary-dark:hover {
+  color: var(--sarana-primary-dark);
+}
+
+/* Focus states */
+.focus\:ring-sarana-primary:focus {
+  --tw-ring-color: var(--sarana-primary);
+}
+
+.focus\:border-sarana-primary:focus {
+  border-color: var(--sarana-primary);
+}
+
+/* Gradient utilities */
+.bg-gradient-sarana {
+  background: linear-gradient(to right, var(--sarana-primary), var(--sarana-primary-light));
+}
+
+.bg-gradient-sarana-reverse {
+  background: linear-gradient(to right, var(--sarana-primary-light), var(--sarana-primary));
+}
+
+
