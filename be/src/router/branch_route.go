@@ -10,7 +10,7 @@ import (
 func BranchRoutes(v1 fiber.Router, branchService service.BranchService) {
 	branchController := controller.NewBranchController(branchService)
 
-	branch := v1.Group("/branch")
+	branch := v1.Group("/branches")
 
 	branch.Post("/", branchController.Create)         
 	branch.Get("/", branchController.GetAll)          
