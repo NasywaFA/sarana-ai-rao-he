@@ -9,7 +9,7 @@ import (
 
 type ActiveBranch struct {
 	ID			uuid.UUID `gorm:"primaryKey" json:"id"`
-	UserID		uuid.UUID `gorn:"uniqueIndex" json:""user_id`
+	UserID		uuid.UUID `gorm:"uniqueIndex" json:"user_id"`
 	BranchID	uuid.UUID `json:"branch_id"`
 	UpdatedAt	time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }

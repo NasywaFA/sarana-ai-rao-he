@@ -17,7 +17,7 @@ type User struct {
 	CreatedAt     time.Time `gorm:"autoCreateTime:milli" json:"-"`
 	UpdatedAt     time.Time `gorm:"autoCreateTime:milli;autoUpdateTime:milli" json:"-"`
 	Token         []Token   `gorm:"foreignKey:user_id;references:id" json:"-"`
-	ActiveBranch *Branch `gorm:"-" json:"active_branch,omitempty"`
+	ActiveBranch *Branch 	`gorm:"-" json:"active_branch,omitempty"`
 }
 
 func (user *User) BeforeCreate(_ *gorm.DB) error {
