@@ -4,10 +4,11 @@ CREATE TABLE items (
     code        VARCHAR(50)     NOT NULL,
     name        VARCHAR(255)    NOT NULL,
     type        VARCHAR(50)     NOT NULL,
-    stock       INT             NOT NULL,
     unit        VARCHAR(20)     NOT NULL,
+    stock       DOUBLE PRECISION NOT NULL DEFAULT 0,
     lead_time   INT             NOT NULL,
     created_at  TIMESTAMP       DEFAULT NOW(),
     updated_at  TIMESTAMP       DEFAULT NOW(),
-    deleted_at  TIMESTAMP
+    deleted_at  TIMESTAMP,
+    CONSTRAINT idx_code_branch UNIQUE (code, branch_id)
 );

@@ -1,5 +1,11 @@
 package validation
 
+import (
+	"time"
+	
+	"github.com/google/uuid"
+)
+
 type CreateItem struct {
     BranchID string `json:"branch_id" validate:"required,uuid"`
     Code     string `json:"code" validate:"required"`
@@ -25,4 +31,23 @@ type QueryItem struct {
 	BranchID string `json:"branch_id" form:"branch_id"`
 	Page     int    `json:"page" form:"page" validate:"omitempty,min=1"`
 	Limit    int    `json:"limit" form:"limit" validate:"omitempty,min=1,max=100"`
+}
+
+type CreateItemTransaction struct {
+	ItemID          uuid.UUID      `json:"item_id" validate:"required"`
+	BranchID        string    `json:"branch_id" validate:"required"`
+	Type            string    `json:"type" validate:"required,oneof=in out"`
+	Amount          float64   `json:"amount" validate:"required,gt=0"`
+	Note            string    `json:"note"`
+	TransactionDate time.Time `json:"transaction_date"`
+}
+
+type QueryItemTransaction struct {
+	Page     int       `query:"page"`
+	Limit    int       `query:"limit"`
+	ItemID   uint      `query:"item_id"`
+	BranchID string    `query:"branch_id"`
+	Type     string    `query:"type"`
+	FromDate time.Time `query:"from_date"`
+	ToDate   time.Time `query:"to_date"`
 }

@@ -6,6 +6,7 @@ import (
 	"app/src/validation"
 	"errors"
 	"time"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -32,6 +33,21 @@ type branchService struct {
 }
 
 func NewBranchService(db *gorm.DB, validate *validator.Validate) BranchService {
+	_ = validate.RegisterValidation("emailcsv", func(fl validator.FieldLevel) bool {
+    value := fl.Field().String()
+    if value == "" {
+        return true
+    }
+    emails := strings.Split(value, ",")
+    for _, email := range emails {
+        email = strings.TrimSpace(email)
+        if err := validator.New().Var(email, "email"); err != nil {
+            return false
+        }
+    }
+    return true
+})
+
 	return &branchService{
 		Log:      utils.Log,
 		DB:       db,

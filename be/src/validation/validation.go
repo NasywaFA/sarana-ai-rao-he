@@ -64,3 +64,12 @@ func Validator() *validator.Validate {
 
 	return validate
 }
+
+func ValidateStruct(data interface{}) error {
+    validate := Validator()
+    if validate == nil {
+        return fmt.Errorf("validator initialization failed")
+    }
+
+    return validate.Struct(data)
+}
