@@ -2,7 +2,7 @@ CREATE TABLE item_transactions (
     id              UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
     branch_id       UUID            NOT NULL REFERENCES branches(id) ON DELETE CASCADE,
     item_id         UUID            NOT NULL REFERENCES items(id),
-    type            VARCHAR(10)     NOT NULL, -- 'in' or 'out'
+    type            VARCHAR(50)     NOT NULL, -- 'in' or 'out' or 'transfer_in' or 'transfer_out' or 'cook_in' or 'cook_out'
     amount          DOUBLE PRECISION NOT NULL,
     current_stock   DOUBLE PRECISION NOT NULL,
     note            TEXT,

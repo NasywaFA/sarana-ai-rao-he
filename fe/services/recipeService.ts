@@ -43,7 +43,7 @@ export async function getRecipes(
     const json = await response.json();
     return {
       isSuccess: true,
-      data: json.results,
+      data: json.data,
       message: "Recipes retrieved successfully",
     };
   } catch (error) {

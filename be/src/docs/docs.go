@@ -649,7 +649,136 @@ const docTemplate = `{
                     }
                 }
             }
-        }
+        },
+        /branches: {
+            post:
+            consumes:
+                - application/json
+            description: Create a new branch with name, slug, contact information, and creator details.
+            parameters:
+                - description: Request body
+            in: body
+            name: request
+            required: true
+            schema:
+                $ref: '#/definitions/validation.CreateBranch'
+            produces:
+                - application/json
+            responses:
+                "201":
+                    description: Branch created successfully
+                    schema:   
+                    $ref: '#/definitions/example.CreateBranchResponse'
+                "400":
+                    description: Bad request - validation failed
+                    schema:
+                        $ref: '#/definitions/example.BadRequest'
+                "409":
+                    description: Branch slug already exists
+                    schema:
+                        $ref: '#/definitions/example.Conflict'
+            summary: Create a new branch
+            tags:
+                - Branch
+        },  
+        /items:
+            post:
+            consumes:
+                - application/json
+            description: Create a new inventory item with code, name, type, unit, stock level, and lead time.
+            parameters:
+                - description: Request body
+            in: body
+            name: request
+            required: true
+            schema:
+                $ref: '#/definitions/validation.CreateItem'
+            produces:
+                - application/json
+            responses:
+                "201":
+                    description: Item created successfully
+                    schema:
+                        $ref: '#/definitions/example.CreateItemResponse'
+                "400":
+                    description: Bad request - validation failed
+                    schema:
+                        $ref: '#/definitions/example.BadRequest'
+                "404":
+                    description: Branch not found
+                    schema:
+                        $ref: '#/definitions/example.NotFound'
+                "409":
+                    description: Item code already exists for this branch
+                    schema:
+                        $ref: '#/definitions/example.Conflict'
+                summary: Create a new item
+            tags:
+                - Item
+        /transactions:
+    post:
+      consumes:
+      - application/json
+      description: Create a new stock transaction (in/out) and automatically update item stock level.
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/validation.CreateItemTransaction'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Transaction created successfully
+          schema:
+            $ref: '#/definitions/example.CreateTransactionResponse'
+        "400":
+          description: Bad request - validation failed or insufficient stock
+          schema:
+            $ref: '#/definitions/example.BadRequest'
+        "404":
+          description: Item or branch not found
+          schema:
+            $ref: '#/definitions/example.NotFound'
+      summary: Create a new transaction
+      tags:
+      - Transaction
+      recipes:
+    post:
+      consumes:
+      - application/json
+      description: Create a new recipe with code, name, type, instructions, and ingredient list. Validates ingredient availability and stock levels.
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/validation.CreateRecipe'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Recipe created successfully
+          schema:
+            $ref: '#/definitions/example.CreateRecipeResponse'
+        "400":
+          description: Bad request - validation failed or insufficient stock
+          schema:
+            $ref: '#/definitions/example.BadRequest'
+        "404":
+          description: Branch, item, or ingredient not found
+          schema:
+            $ref: '#/definitions/example.NotFound'
+            "409":
+                description: Recipe code already exists
+            schema:
+                $ref: '#/definitions/example.Conflict'
+        summary: Create a new recipe
+        tags:
+        - Recipe
     },
     "definitions": {
         "example.CreateUserResponse": {

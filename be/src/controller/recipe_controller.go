@@ -3,12 +3,13 @@ package controller
 import (
 	"app/src/service"
 	"app/src/validation"
-
+	
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
 type RecipeController struct {
-	RecipeService service.RecipeService	
+	RecipeService service.RecipeService
 }
 
 func NewRecipeController(recipeService service.RecipeService) *RecipeController {
@@ -17,81 +18,115 @@ func NewRecipeController(recipeService service.RecipeService) *RecipeController 
 	}
 }
 
-func (rc *RecipeController) Create(c *fiber.Ctx) error {
+func (r *RecipeController) Create(c *fiber.Ctx) error {
 	var req validation.CreateRecipe
-
 	if err := c.BodyParser(&req); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Invalid request body")
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	recipe, err := rc.RecipeService.CreateRecipe(c, &req)
+	recipe, err := r.RecipeService.CreateRecipe(c, &req)
 	if err != nil {
-		return err
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(recipe)
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"success": true,
+		"message": "Recipe created successfully",
+		"data":    recipe,
+	})
 }
 
-func (rc *RecipeController) GetAllByBranch(c *fiber.Ctx) error {
-    branchID := c.Query("branch_id")
-    if branchID == "" {
-        return fiber.NewError(fiber.StatusBadRequest, "branch_id is required")
-    }
+func (r *RecipeController) GetAll(c *fiber.Ctx) error {
+	params := new(validation.QueryRecipe)
+	// Parse query
+	if err := c.QueryParser(params); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid query parameters")
+	}
 
-    recipes, err := rc.RecipeService.GetRecipes(c, branchID)
+	// Validate
+	validate := validator.New()
+	if err := validate.Struct(params); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+    // Call service
+    recipes, total, err := r.RecipeService.GetRecipes(c, params)
     if err != nil {
         return err
     }
 
-    return c.JSON(recipes)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"message": "Recipes retrieved successfully",
+		"data":    recipes,
+		"total":   total,
+	})
 }
 
+func (r *RecipeController) GetByID(c *fiber.Ctx) error {
+	id := c.Params("id")
 
-func (rc *RecipeController) GetByID(c *fiber.Ctx) error {
-    id := c.Params("id")
-    if id == "" {
-        return fiber.NewError(fiber.StatusBadRequest, "Invalid ID")
-    }
+	recipe, err := r.RecipeService.GetRecipeByID(c, id)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
 
-    recipe, err := rc.RecipeService.GetRecipeByID(c, id)
-    if err != nil {
-        return err
-    }
-
-    return c.JSON(recipe)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"message": "Recipe retrieved successfully",
+		"data":    recipe,
+	})
 }
 
+func (r *RecipeController) Update(c *fiber.Ctx) error {
+	id := c.Params("id")
 
-func (rc *RecipeController) Update(c *fiber.Ctx) error {
-    id := c.Params("id")
-    if id == "" {
-        return fiber.NewError(fiber.StatusBadRequest, "Invalid ID")
-    }
+	var req validation.UpdateRecipe
+	if err := c.BodyParser(&req); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
 
-    var req validation.UpdateRecipe
-    if err := c.BodyParser(&req); err != nil {
-        return fiber.NewError(fiber.StatusBadRequest, "Invalid request body")
-    }
+	recipe, err := r.RecipeService.UpdateRecipe(c, id, &req)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
 
-    updatedRecipe, err := rc.RecipeService.UpdateRecipe(c, id, &req)
-    if err != nil {
-        return err
-    }
-
-    return c.JSON(updatedRecipe)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"message": "Recipe updated successfully",
+		"data":    recipe,
+	})
 }
 
-func (rc *RecipeController) Delete(c *fiber.Ctx) error {
-    id := c.Params("id")
-    if id == "" {
-        return fiber.NewError(fiber.StatusBadRequest, "Invalid ID")
-    }
+func (r *RecipeController) Delete(c *fiber.Ctx) error {
+	id := c.Params("id")
 
-    if err := rc.RecipeService.DeleteRecipe(c, id); err != nil {
-        return err
-    }
+	if err := r.RecipeService.DeleteRecipe(c, id); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
 
-    return c.JSON(fiber.Map{
-        "message": "Recipe deleted successfully",
-    })
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"message": "Recipe deleted successfully",
+	})
+}
+
+func (r *RecipeController) Cook(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	var req validation.CookRecipe
+	if err := c.BodyParser(&req); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	result, err := r.RecipeService.CookRecipe(c, id, &req)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"message": "Recipe cooked successfully",
+		"data":    result,
+	})
 }

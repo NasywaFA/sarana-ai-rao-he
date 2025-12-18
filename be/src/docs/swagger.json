@@ -642,6 +642,178 @@
                     }
                 }
             }
+        },
+        "/branches": {
+            "post": {
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["Branch"],
+                "summary": "Create a new branch",
+                "description": "Create a new branch with name, slug, contact information, and creator details.",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/validation.CreateBranch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Branch created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/example.CreateBranchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - validation failed",
+                        "schema": {
+                            "$ref": "#/definitions/example.BadRequest"
+                        }
+                    },
+                    "409": {
+                        "description": "Branch slug already exists",
+                        "schema": {
+                            "$ref": "#/definitions/example.Conflict"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/items": {
+            "post": {
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["Item"],
+                "summary": "Create a new item",
+                "description": "Create a new inventory item with code, name, type, unit, stock level, and lead time.",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/validation.CreateItem"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Item created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/example.CreateItemResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - validation failed",
+                        "schema": {
+                            "$ref": "#/definitions/example.BadRequest"
+                        }
+                    },
+                    "404": {
+                        "description": "Branch not found",
+                        "schema": {
+                            "$ref": "#/definitions/example.NotFound"
+                        }
+                    },
+                    "409": {
+                        "description": "Item code already exists for this branch",
+                        "schema": {
+                            "$ref": "#/definitions/example.Conflict"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/transactions": {
+            "post": {
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["Transaction"],
+                "summary": "Create a new transaction",
+                "description": "Create a new stock transaction (in/out) and automatically update item stock level.",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/validation.CreateItemTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Transaction created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/example.CreateTransactionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - validation failed or insufficient stock",
+                        "schema": {
+                            "$ref": "#/definitions/example.BadRequest"
+                        }
+                    },
+                    "404": {
+                        "description": "Item or branch not found",
+                        "schema": {
+                            "$ref": "#/definitions/example.NotFound"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/recipes": {
+            "post": {
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["Recipe"],
+                "summary": "Create a new recipe",
+                "description": "Create a new recipe with code, name, type, instructions, and ingredient list. Validates ingredient availability and stock levels.",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/validation.CreateRecipe"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Recipe created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/example.CreateRecipeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - validation failed or insufficient stock",
+                        "schema": {
+                            "$ref": "#/definitions/example.BadRequest"
+                        }
+                    },
+                    "404": {
+                        "description": "Branch, item, or ingredient not found",
+                        "schema": {
+                            "$ref": "#/definitions/example.NotFound"
+                        }
+                    },
+                    "409": {
+                        "description": "Recipe code already exists",
+                        "schema": {
+                            "$ref": "#/definitions/example.Conflict"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1351,14 +1523,511 @@
                     "example": "password1"
                 }
             }
+        },
+        "validation.CreateBranch": {
+            "type": "object",
+            "required": ["name", "slug", "created_by"],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Rao He Sudirman"
+                },
+                "slug": {
+                    "type": "string",
+                    "example": "rao-he-sudirman"
+                },
+                "pic_emails": {
+                    "type": "string",
+                    "example": "raohesudirman@mail.com"
+                },
+                "pic_phone_number": {
+                    "type": "string",
+                    "example": "081111111111"
+                },
+                "created_by": {
+                    "type": "string",
+                    "example": "admin"
+                }
+            }
+        },
+        "validation.CreateItem": {
+            "type": "object",
+            "required": ["branch_id", "code", "name", "type", "unit", "stock", "lead_time"],
+            "properties": {
+                    "branch_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "7fd304e5-ce68-4be5-aa78-e9d476635b49"
+                },
+                "code": {
+                    "type": "string",
+                    "example": "EGG-001"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Telur"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["inventory_purchased", "half_finished", "finished"],
+                    "example": "inventory_purchased"
+                },
+                "unit": {
+                    "type": "string",
+                    "example": "kg"
+                },
+                "stock": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 50
+                },
+                "lead_time": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+    "validation.CreateItemTransaction": {
+        "type": "object",
+        "required": ["branch_id", "item_id", "type", "amount"],
+        "properties": {
+            "branch_id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "d1553d55-a265-41f6-a519-851da3bee050"
+            },
+            "item_id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "dcc6a67b-0917-474e-bca2-07ce86eaea3f"
+            },
+            "type": {
+                "type": "string",
+                "enum": ["in", "out"],
+                "example": "in"
+            },
+            "amount": {
+                "type": "number",
+                "format": "float",
+                "example": 50
+            },
+            "note": {
+                "type": "string",
+                "example": "testing"
+            },
+            "transaction_date": {
+                "type": "string",
+                "format": "date-time"
+            }
         }
     },
-    "securityDefinitions": {
-        "BearerAuth": {
-            "description": "Example Value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
+    "validation.CreateRecipe": {
+        "type": "object",
+        "required": ["branch_id", "code", "name", "type", "created_by", "ingredients"],
+        "properties": {
+            "branch_id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "7fd304e5-ce68-4be5-aa78-e9d476635b49"
+            },
+            "code": {
+                "type": "string",
+                "example": "DESSERT-004"
+            },
+            "name": {
+                "type": "string",
+                "example": "Pancake"
+            },
+            "type": {
+                "type": "string",
+                "enum": ["half_finished", "finished"],
+                "example": "finished"
+            },
+            "description": {
+                "type": "string",
+                "example": "Pancake"
+            },
+            "instruction": {
+                "type": "string",
+                "example": "Beli aja gampang kok"
+            },
+            "created_by": {
+                "type": "string",
+                "format": "uuid",
+                "example": "5d11dd12-d56c-4989-9b3c-b5dd7a0964b3"
+            },
+            "ingredients": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/validation.RecipeIngredient"
+                }
+            }
         }
+    },  
+    "validation.RecipeIngredient": {
+        "type": "object",
+        "required": ["branch_id", "item_id", "quantity", "unit"],
+        "properties": {
+            "branch_id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "7fd304e5-ce68-4be5-aa78-e9d476635b49"
+            },
+            "item_id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "76ddced6-4307-4086-85ba-e86dd0e821d7"
+            },
+            "quantity": {
+                "type": "number",
+                "format": "float",
+                "example": 0.5
+            },
+            "unit": {
+                "type": "string",
+                "example": "kg"
+            }
+        }
+    },  
+    "example.CreateBranchResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "string",
+                "example": "success"
+            },
+            "code": {
+                "type": "integer",
+                "example": 201
+            },
+            "message": {
+                "type": "string",
+                "example": "Branch created successfully"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "slug": {
+                        "type": "string"
+                    },
+                    "pic_emails": {
+                        "type": "string"
+                    },
+                    "pic_phone_number": {
+                        "type": "string"
+                    },
+                    "created_by": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            }
+        }
+    },
+    "example.CreateItemResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "string",
+                "example": "success"
+            },
+            "code": {
+                "type": "integer",
+                "example": 201
+            },
+            "message": {
+                "type": "string",
+                "example": "Item created successfully"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "branch_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "unit": {
+                        "type": "string"
+                    },
+                    "stock": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "lead_time": {
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            }
+        }
+    },  
+    "example.CreateTransactionResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "string",
+                "example": "success"
+            },
+            "code": {
+                "type": "integer",
+                "example": 201
+            },
+            "message": {
+                "type": "string",
+                "example": "Transaction created successfully"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "branch_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+              "item_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number",
+                "format": "float"
+              },
+              "current_stock": {
+                "type": "number",
+                "format": "float"
+              },
+              "note": {
+                "type": "string"
+              },
+              "transaction_date": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "item": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "stock": {
+                    "type": "number",
+                    "format": "float"
+                  }
+                }
+              }
+            }
+          }
+        }
+    },
+    "example.CreateRecipeResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "example": "success"
+        },
+        "code": {
+          "type": "integer",
+          "example": 201
+        },
+        "message": {
+          "type": "string",
+          "example": "Recipe created successfully"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "branch_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "code": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "instruction": {
+              "type": "string"
+            },
+            "created_by": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "ingredients": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "recipe_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "item_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "quantity": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "unit": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "example.BadRequest": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "example": "error"
+        },
+        "code": {
+          "type": "integer",
+          "example": 400
+        },
+        "message": {
+          "type": "string",
+          "example": "Validation failed"
+        },
+        "data": {
+          "type": "object",
+          "nullable": true
+        }
+      }
+    },
+    "example.Conflict": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "example": "error"
+        },
+        "code": {
+          "type": "integer",
+          "example": 409
+        },
+        "message": {
+          "type": "string",
+          "example": "Resource already exists"
+        },
+        "data": {
+          "type": "object",
+          "nullable": true
+        }
+      }
+    },
+    "example.NotFound": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "example": "error"
+        },
+        "code": {
+          "type": "integer",
+          "example": 404
+        },
+        "message": {
+          "type": "string",
+          "example": "Resource not found"
+        },
+        "data": {
+          "type": "object",
+          "nullable": true
+        }
+      }
     }
+  },
+  "securityDefinitions": {
+    "BearerAuth": {
+      "description": "Example Value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
 }

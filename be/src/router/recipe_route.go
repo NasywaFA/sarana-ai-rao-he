@@ -13,8 +13,10 @@ func RecipeRoutes(v1 fiber.Router, recipeService service.RecipeService) {
 	recipes := v1.Group("/recipes")
 
 	recipes.Post("/", recipeController.Create)
-	recipes.Get("/", recipeController.GetAllByBranch)
+	recipes.Get("/", recipeController.GetAll)
 	recipes.Get("/:id", recipeController.GetByID)
 	recipes.Put("/:id", recipeController.Update)
 	recipes.Delete("/:id", recipeController.Delete)
+
+	recipes.Post("/:id/cook", recipeController.Cook)
 }

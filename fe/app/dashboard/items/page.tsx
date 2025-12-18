@@ -21,6 +21,7 @@ import { AlertModal } from "@/components/confirmDelete";
 import { getBranchData } from "@/helpers/misc";
 import ViewLogsModal from "@/components/items/ViewLogsModal";
 import TransferModal from "@/components/items/TransferModal";
+import { getCurrentBranch, getCurrentBranchWithDetails } from "@/services/branchesService";
 
 export default function ItemsPage() {
   const [items, setItems] = useState<ItemType[]>([]);
@@ -93,13 +94,15 @@ export default function ItemsPage() {
   const loadItems = async () => {
     try {
       setLoading(true);
-      const branch = await getBranchData();
-      if (!branch) {
+      const branchResp = await getCurrentBranch();
+      if (!branchResp.isSuccess || !branchResp.data) {
         toast.error("Branch not found");
         return;
       }
 
-      const response = await getItems(1, 1000, branch.id);
+      const branchId = branchResp.data;
+
+      const response = await getItems(1, 1000, branchId);
       if (response.isSuccess) {
         setItems(response.data);
       } else {
@@ -177,7 +180,7 @@ export default function ItemsPage() {
   };
 
   const handleSaveItem = async (updatedItemData: Record<string, any>) => {
-    try {
+    try {items
       setActionLoading(true);
 
       if (!selectedItem) return;

@@ -19,3 +19,28 @@ func Password(field validator.FieldLevel) bool {
 
 	return true
 }
+
+func AlphanumDash(field validator.FieldLevel) bool {
+	value := field.Field().String()
+
+	regex := regexp.MustCompile(`^[a-zA-Z0-9-]+$`)
+
+	return regex.MatchString(value)
+}
+
+func (r *TransferItem) Validate() error {
+	validate := validator.New()
+	
+	validate.RegisterValidation("nefield", func(fl validator.FieldLevel) bool {
+		field := fl.Field().String()
+		param := fl.Parent().FieldByName(fl.Param()).String()
+		return field != param
+	})
+	
+	if err := validate.Struct(r); err != nil {
+		return err
+	}
+	
+	return nil
+}
+

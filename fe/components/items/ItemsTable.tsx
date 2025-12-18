@@ -45,12 +45,12 @@ export default function ItemsTable({
       fullLabel: "Half Finished",
       count: items.filter((item) => item.type === "half_finished").length,
     },
-    // {
-    //   id: "finished" as TabType,
-    //   label: "Finished",
-    //   fullLabel: "Finished",
-    //   count: items.filter((item) => item.type === "finished").length,
-    // },
+    {
+      id: "finished" as TabType,
+      label: "Finished",
+      fullLabel: "Finished",
+      count: items.filter((item) => item.type === "finished").length,
+    },
   ];
 
   const filterItems = (item: ItemType) => {
@@ -229,7 +229,7 @@ export default function ItemsTable({
             <tbody className="bg-white divide-y divide-gray-200">
               {pagination.currentItems.map((item) => (
                 <tr
-                  key={item.code}
+                  key={`${item.branch_id}-${item.code}`}
                   className="hover:bg-gray-50 transition-colors"
                 >
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sm:px-6">

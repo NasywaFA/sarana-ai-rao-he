@@ -28,11 +28,13 @@ export interface ItemTypeWithQuantityAndNotEnoughItems extends ItemTypeWithQuant
   not_enough_items: ItemTypeWithQuantityAndNotEnoughItems[];
 }
 
+export type ItemTransactionTypeEnum = "in" | "out" | "transfer_in" | "transfer_out";
+
 export interface ItemTransactionType {
   id?: string;
   amount: number;
   current_stock: number;
-  type: "in" | "out";
+  type: ItemTransactionTypeEnum;
   note?: string;
 
   item_id: string;

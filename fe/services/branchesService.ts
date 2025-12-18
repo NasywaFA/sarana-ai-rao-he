@@ -31,9 +31,9 @@ export async function changeBranch(branchId: string): Promise<CommonResponse<str
 export async function getCurrentBranch(): Promise<CommonResponse<string>> {
     const projectName = process.env.PROJECT_NAME;
     const cookieStore = await cookies();
-    const branchId = cookieStore.get(`${projectName}_branch`);
+    const branchCookie = cookieStore.get(`${projectName}_branch`);
 
-    if (!branchId) {
+    if (!branchCookie) {
         return {
             isSuccess: false,
             data: null,
@@ -41,9 +41,20 @@ export async function getCurrentBranch(): Promise<CommonResponse<string>> {
         }
     }
 
+    let branchId = branchCookie.value;
+
+    try {
+        const parsed = JSON.parse(branchCookie.value);
+        if (parsed?.id) {
+            branchId = parsed.id;
+        }
+    } catch {
+        // cookie is plain UUID → ignore
+    }
+
     return {
         isSuccess: true,
-        data: branchId.value,
+        data: branchId,
         message: 'Branch ID found'
     }
 }
@@ -138,9 +149,18 @@ export async function getBranchById(branchId: string): Promise<BranchTypeRespons
         }
 
         const json = await response.json();
+
+        if (!json || !json.id) {
+            return {
+                isSuccess: false,
+                data: null,
+                message: 'Invalid branch response'
+            };
+        }
+
         return {
             isSuccess: true,
-            data: json.data || json.branch || null,
+            data: json,
             message: json.message
         };
     } catch (error) {

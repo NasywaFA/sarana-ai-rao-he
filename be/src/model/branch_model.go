@@ -2,12 +2,12 @@ package model
 
 import (
 	"time"
-	
+
 	"github.com/google/uuid"
 )
 
 type Branch struct {
-	ID               uuid.UUID  `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
+	ID               uuid.UUID  `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
 	Name             string     `gorm:"not null;unique" json:"name"`
 	Slug             string     `gorm:"not null;unique" json:"slug"`
 	PicEmails        string     `gorm:"default:''" json:"pic_emails"`

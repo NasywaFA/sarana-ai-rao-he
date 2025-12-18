@@ -37,7 +37,7 @@ export async function getItems(
     const jsonStr = await response.json();
     return {
       isSuccess: true,
-      data: jsonStr.items,
+      data: jsonStr.data,
       message: "Items retrieved successfully",
     };
   } catch (error) {
@@ -372,6 +372,7 @@ export async function deleteWasteLog(itemId: string, id: string): Promise<{ isSu
   }
 }
 
+// item transactions
 export async function getItemTransactions(page: number = 1, limit: number = 10, search?: string): Promise<{ isSuccess: boolean; data: ItemTransactionType[]; paginationMetadata: PaginationMetadataType, message?: string }> {
   let paginationMetadata: PaginationMetadataType = {
     page,
@@ -382,15 +383,20 @@ export async function getItemTransactions(page: number = 1, limit: number = 10, 
 
   try {
     // Get current branch
-    const branchId = await getCurrentBranch();
-    if (!branchId.isSuccess) {
+    const branch = await getCurrentBranch();
+    if (!branch.isSuccess) {
       return { isSuccess: false, data: [], paginationMetadata, message: "Failed to get current branch" };
     }
-
-    const response = await requestToService(`v1/item-transactions?branch_id=${branchId.data}&page=${page}&limit=${limit}${search ? `&search=${encodeURIComponent(search)}` : ""}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
+    
+    const branchId = branch.data;
+    
+    const response = await requestToService(
+      `v1/items/transactions?branch_id=${branchId}&page=${page}&limit=${limit}${search ? `&search=${encodeURIComponent(search)}` : ""}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
     if (!response.ok) {
       const json = await response.json();
@@ -398,15 +404,16 @@ export async function getItemTransactions(page: number = 1, limit: number = 10, 
     }
     const json = await response.json();
 
-    paginationMetadata.totalPages = json.total_pages;
-    paginationMetadata.totalResults = json.total_results;
+    paginationMetadata.totalPages = Math.ceil(json.data.total / limit);
+    paginationMetadata.totalResults = json.data.total;
 
-    return { isSuccess: true, data: json.item_transactions || [], paginationMetadata, message: json.message };
+    return { isSuccess: true, data: json.data.transactions || [], paginationMetadata, message: json.message };
   } catch (error) {
     return { isSuccess: false, data: [], paginationMetadata, message: (error as Error).message || "Failed to fetch item transactions" };
   }
 }
 
+// transfer item between branches
 export async function transferItem(body: {
   amount: number;
   from_branch_id: string;
@@ -415,22 +422,37 @@ export async function transferItem(body: {
   to_branch_id: string;
 }): Promise<{ isSuccess: boolean; message: string }> {
   try {
-    const response = await requestToService(`v1/item-transactions/transfer`, {
+
+    const response = await requestToService(`v1/items/transfer`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        item_id: body.item_id,
+        from_branch_id: body.from_branch_id,
+        to_branch_id: body.to_branch_id,
+        amount: body.amount,
+        note: body.note,
+      }),
     });
 
+    const json = await response.json();
+
     if (!response.ok) {
-      const json = await response.json();
-      return { isSuccess: false, message: json.message };
+      return { 
+        isSuccess: false, 
+        message: json.message || "Failed to transfer item" 
+      };
     }
 
-    const json = await response.json();
-    return { isSuccess: true, message: json.message || "Item transferred successfully" };
-  
+    return { 
+      isSuccess: true, 
+      message: json.message || "Item transferred successfully" 
+    };
   } catch (error) {
-    console.error(`Failed to transfer item: ${error}`);
-    return { isSuccess: false, message: "Failed to transfer item" };
+    console.error("Transfer item error:", error);
+    return { 
+      isSuccess: false, 
+      message: error instanceof Error ? error.message : "Failed to transfer item" 
+    };
   }
 }

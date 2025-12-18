@@ -62,6 +62,10 @@ func Validator() *validator.Validate {
 		return nil
 	}
 
+	if err := validate.RegisterValidation("alphanumdash", AlphanumDash); err != nil {
+		return nil
+	}
+
 	return validate
 }
 

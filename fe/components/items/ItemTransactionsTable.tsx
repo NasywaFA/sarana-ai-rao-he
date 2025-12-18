@@ -42,27 +42,39 @@ export default function ItemTransactionsTable({ loading }: ItemTransactionsTable
     }
   };
 
-  const formatDateTime = (dateTimeString: string) => {
-    const date = new Date(dateTimeString);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZoneName: 'short'
-    });
-  };
+  // const formatDateTime = (dateTimeString: string) => {
+  //   const date = new Date(dateTimeString);
+  //   return date.toLocaleString('en-US', {
+  //     year: 'numeric',
+  //     month: 'short',
+  //     day: '2-digit',
+  //     hour: '2-digit',
+  //     minute: '2-digit',
+  //     timeZoneName: 'short'
+  //   });
+  // };
 
-  const getTransactionTypeBadge = (type: "in" | "out") => {
+  const cleanDateTime = (dateTimeString: string) => {
+    return dateTimeString
+    .split(".")[0]
+    .replace("T", " ")
+    .replace("Z", "");
+  };
+  
+  const getTransactionTypeBadge = (type: "in" | "out" | "transfer_in" | "transfer_out") => {
+
+    console.log("Transaction type:", type, "Type of:", typeof type);
+
     const badgeClasses = {
       in: "bg-green-100 text-green-800",
       out: "bg-red-100 text-red-800",
+      transfer_in: "bg-blue-100 text-blue-800",
+      transfer_out: "bg-orange-100 text-orange-800",
     };
 
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClasses[type]}`}>
-        {type === "in" ? "Stock In" : "Stock Out"}
+        {type === "in" ? "Stock In" : type === "out" ? "Stock Out" : type === "transfer_in" ? "Transfer In" : "Transfer Out"}
       </span>
     );
   };
@@ -172,7 +184,7 @@ export default function ItemTransactionsTable({ loading }: ItemTransactionsTable
               transactions.map((transaction) => (
                 <tr key={transaction.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {transaction.created_at ? formatDateTime(transaction.created_at) : "???"}
+                    {transaction.created_at ? cleanDateTime(transaction.created_at) : "???"}
                   </td>
                   <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">

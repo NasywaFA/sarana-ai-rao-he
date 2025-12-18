@@ -1,13 +1,10 @@
 package controller
 
 import (
-	"strconv"
-	"strings"
 	"app/src/service"
 	"app/src/validation"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/go-playground/validator/v10"
 )
 
 type ItemController struct {
@@ -109,7 +106,7 @@ func (i *ItemController) Delete(c *fiber.Ctx) error {
 	})
 }
 
-func (ctr *ItemController) ImportCSV(c *fiber.Ctx) error {
+func (i *ItemController) ImportCSV(c *fiber.Ctx) error {
 	branchID := c.Query("branch_id")
 	if branchID == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "branch_id is required")
@@ -126,136 +123,12 @@ func (ctr *ItemController) ImportCSV(c *fiber.Ctx) error {
 	}
 	defer f.Close()
 
-	err = ctr.ItemService.ImportCSV(c, branchID, f)
+	err = i.ItemService.ImportCSV(c, branchID, f)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(fiber.Map{
 		"message": "Items imported successfully",
-	})
-}
-
-func (i *ItemController) CreateTransaction(c *fiber.Ctx) error {
-	req := new(validation.CreateItemTransaction)
-	if err := c.BodyParser(req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"code":    fiber.StatusBadRequest,
-			"message": "Invalid request body",
-			"data":    nil,
-		})
-	}
-
-	validate := validator.New()
-	if err := validate.Struct(req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"code":    fiber.StatusBadRequest,
-			"message": "Validation failed",
-			"data":    err.Error(),
-		})
-	}
-
-	transaction, err := i.ItemService.CreateTransaction(c, req)
-	if err != nil {
-		statusCode := fiber.StatusInternalServerError
-		if strings.Contains(err.Error(), "insufficient stock") {
-			statusCode = fiber.StatusBadRequest
-		} else if strings.Contains(err.Error(), "not found") {
-			statusCode = fiber.StatusNotFound
-		}
-
-		return c.Status(statusCode).JSON(fiber.Map{
-			"status":  "error",
-			"code":    statusCode,
-			"message": err.Error(),
-			"data":    nil,
-		})
-	}
-
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"status":  "success",
-		"code":    fiber.StatusCreated,
-		"message": "Transaction created successfully",
-		"data":    transaction,
-	})
-}
-
-func (i *ItemController) GetAllTransactions(c *fiber.Ctx) error {
-	params := new(validation.QueryItemTransaction)
-	if err := c.QueryParser(params); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"code":    fiber.StatusBadRequest,
-			"message": "Invalid query parameters",
-			"data":    nil,
-		})
-	}
-
-	transactions, total, err := i.ItemService.GetTransactions(c, params)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"code":    fiber.StatusInternalServerError,
-			"message": err.Error(),
-			"data":    nil,
-		})
-	}
-
-	return c.JSON(fiber.Map{
-		"status":  "success",
-		"code":    fiber.StatusOK,
-		"message": "Transactions retrieved successfully",
-		"data": fiber.Map{
-			"transactions": transactions,
-			"total":        total,
-			"page":         params.Page,
-			"limit":        params.Limit,
-		},
-	})
-}
-
-func (i *ItemController) GetTransactions(c *fiber.Ctx) error {
-	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"code":    fiber.StatusBadRequest,
-			"message": "Invalid item ID",
-			"data":    nil,
-		})
-	}
-
-	params := new(validation.QueryItemTransaction)
-	if err := c.QueryParser(params); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"code":    fiber.StatusBadRequest,
-			"message": "Invalid query parameters",
-			"data":    nil,
-		})
-	}
-
-	transactions, total, err := i.ItemService.GetItemTransactions(c, uint(id), params)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"code":    fiber.StatusInternalServerError,
-			"message": err.Error(),
-			"data":    nil,
-		})
-	}
-
-	return c.JSON(fiber.Map{
-		"status":  "success",
-		"code":    fiber.StatusOK,
-		"message": "Item transactions retrieved successfully",
-		"data": fiber.Map{
-			"transactions": transactions,
-			"total":        total,
-			"page":         params.Page,
-			"limit":        params.Limit,
-		},
 	})
 }
